@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PageStatus {
+  ACTIVE
+  ARCHIVED
+  FAILED
+}
+
+enum CrawlJobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum WorkerStatusType {
+  ONLINE
+  OFFLINE
+  BUSY
+}
+
+model Source {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  slug        String  @unique
+  baseUrl     String
+  description String?
+
+  isActive Boolean @default(true)
+
+  pages         Page[]
+  crawlJobs     CrawlJob[]
+  crawlStartUrl String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("sources")
+}
+
+model Page {
+  id String @id @default(uuid())
+
+  sourceId String
+  source   Source @relation(fields: [sourceId], references: [id])
+
+  title String @db.Text
+  url   String @unique
+
+  content String @db.Text
+
+  contentHash String
+
+  status PageStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sourceId])
+  @@index([contentHash])
+  @@map("pages")
+}
+
+model SearchLog {
+  id String @id @default(uuid())
+
+  query String
+
+  resultsCount Int
+
+  executionTimeMs Int
+
+  createdAt DateTime @default(now())
+
+  @@map("search_logs")
+}
+
+model CrawlJob {
+  id String @id @default(uuid())
+
+  sourceId String
+  source   Source @relation(fields: [sourceId], references: [id])
+
+  status CrawlJobStatus
+
+  pagesDiscovered Int @default(0)
+
+  pagesProcessed Int @default(0)
+
+  startedAt DateTime?
+
+  finishedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@map("crawl_jobs")
+}
+
+model WorkerStatus {
+  id String @id @default(uuid())
+
+  workerName String @unique
+
+  status WorkerStatusType
+
+  lastHeartbeat DateTime
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@map("worker_status")
+}
