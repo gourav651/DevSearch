@@ -1,0 +1,14 @@
+import { prisma } from "../lib/prisma";
+
+export class SourceRepository {
+  async findAll() {
+    return prisma.source.findMany({
+      where: {
+        isActive: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+  }
+}

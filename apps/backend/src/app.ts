@@ -3,6 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 
+import sourceRoutes from "./routes/source.routes";
+
 const app = express();
 
 app.use(cors());
@@ -13,10 +15,13 @@ app.use(morgan("dev"));
 
 app.use(express.json());
 
-app.get("/", (_, res) => {
+app.get("/", (_req, res) => {
   res.json({
-    message: "DevSearch API Running"
+    success: true,
+    message: "DevSearch API Running",
   });
 });
+
+app.use("/api/v1/sources", sourceRoutes);
 
 export default app;
