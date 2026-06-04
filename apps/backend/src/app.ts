@@ -4,6 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 
 import sourceRoutes from "./routes/source.routes";
+import { errorMiddleware } from "./middlewares/error.middleware";
 
 const app = express();
 
@@ -23,5 +24,6 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/v1/sources", sourceRoutes);
+app.use(errorMiddleware);
 
 export default app;

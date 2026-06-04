@@ -11,4 +11,12 @@ export class SourceRepository {
       },
     });
   }
+
+  async findById(id: string) {
+    return prisma.source.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
 }
