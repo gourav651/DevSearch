@@ -5,6 +5,7 @@ import morgan from "morgan";
 
 import sourceRoutes from "./routes/source.routes";
 import { errorMiddleware } from "./middlewares/error.middleware";
+import searchRoutes from "./routes/search.routes";
 
 const app = express();
 
@@ -24,6 +25,8 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/v1/sources", sourceRoutes);
+app.use("/api/v1/search", searchRoutes);
+
 app.use(errorMiddleware);
 
 export default app;

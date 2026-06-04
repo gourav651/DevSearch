@@ -52,11 +52,14 @@ model Page {
   source   Source @relation(fields: [sourceId], references: [id])
 
   title String @db.Text
-  url   String @unique
+
+  url String @unique
 
   content String @db.Text
 
   contentHash String
+
+  searchVector Unsupported("tsvector")?
 
   status PageStatus @default(ACTIVE)
 
@@ -65,6 +68,7 @@ model Page {
 
   @@index([sourceId])
   @@index([contentHash])
+
   @@map("pages")
 }
 
