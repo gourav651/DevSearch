@@ -19,4 +19,12 @@ export class SourceRepository {
       },
     });
   }
+
+  async findBySlug(slug: string) {
+    return prisma.source.findUnique({
+      where: {
+        slug,
+      },
+    });
+  }
 }
