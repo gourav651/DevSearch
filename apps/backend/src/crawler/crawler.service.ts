@@ -1,8 +1,10 @@
 import axios from "axios";
 import { parseHtml } from "./html-parser";
 import { isDocumentationUrl, isSameDomain, normalizeUrl } from "./url-utils";
+import { CrawlerPersistenceService } from "./crawler-persistence.service";
 
 export class CrawlerService {
+  private persistence = new CrawlerPersistenceService();
   async crawl(url: string) {
     const response = await axios.get(url);
 
@@ -17,7 +19,7 @@ export class CrawlerService {
     return parsedPage;
   }
 
-  async crawlSite(startUrl: string, maxPages = 10) {
+  async crawlSite(startUrl: string, sourceId: string, maxPages = 10) {
     const queue = [startUrl];
 
     const visited = new Set<string>();
@@ -39,7 +41,14 @@ export class CrawlerService {
 
       try {
         const page = await this.crawl(normalizedUrl);
-        console.log(page.title);
+        await this.persistence.savePage(
+          sourceId,
+          page.title,
+          normalizedUrl,
+          page.content,
+        );
+
+        console.log(`Saved: ${page.title}`);
 
         for (const link of page.links) {
           const normalizedLink = normalizeUrl(link);

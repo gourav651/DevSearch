@@ -1,21 +1,33 @@
 import { CrawlerService } from "./crawler.service";
+import { SourceRepository } from "../repositories/source.repository";
 
 async function main() {
   const crawler = new CrawlerService();
 
-  const visited = await crawler.crawlSite(
-    "https://redis.io/docs",
-    10
-  );
+  const sourceRepository =
+    new SourceRepository();
 
-  console.log("\nTOTAL PAGES CRAWLED:");
-  console.log(visited.size);
+  const source =
+    await sourceRepository.findBySlug(
+      "redis"
+    );
 
-  console.log("\nCRAWLED URLS:");
-
-  for (const url of visited) {
-    console.log(url);
+  if (!source) {
+    throw new Error(
+      "Redis source not found"
+    );
   }
+
+  const visited =
+    await crawler.crawlSite(
+      source.crawlStartUrl,
+      source.id,
+      10
+    );
+
+  console.log(
+    `\nTotal Pages Crawled: ${visited.size}`
+  );
 }
 
 main().catch(console.error);
