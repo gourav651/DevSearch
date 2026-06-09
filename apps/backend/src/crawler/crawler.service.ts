@@ -27,6 +27,9 @@ export class CrawlerService {
     const queue = [startUrl];
 
     const visited = new Set<string>();
+    const discovered = new Set<string>();
+
+    discovered.add(startUrl);
     try {
       while (queue.length > 0 && visited.size < maxPages) {
         const currentUrl = queue.shift();
@@ -54,7 +57,7 @@ export class CrawlerService {
 
           await this.crawlJobService.updateProgress(
             job.id,
-            queue.length,
+            discovered.size,
             visited.size,
           );
 
@@ -63,7 +66,8 @@ export class CrawlerService {
           for (const link of page.links) {
             const normalizedLink = normalizeUrl(link);
 
-            if (!visited.has(normalizedLink)) {
+            if (!discovered.has(normalizedLink)) {
+              discovered.add(normalizedLink);
               queue.push(normalizedLink);
             }
           }

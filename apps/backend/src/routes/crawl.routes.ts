@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { CrawlController } from "../controllers/crawl.controller";
+import { validate } from "../middlewares/validate.middleware";
+import { crawlParamsSchema } from "../validators/crawl.validator";
 
 const router = Router();
 
@@ -8,6 +10,7 @@ const crawlController =
 
 router.post(
   "/:sourceSlug",
+  validate(crawlParamsSchema),
   crawlController.startCrawl
 );
 
