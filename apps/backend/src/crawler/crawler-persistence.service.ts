@@ -1,5 +1,7 @@
 import { PageRepository } from "../repositories/page.repository";
-import { generateContentHash } from "./content-hash";
+import {
+  generateContentHash
+} from "@devsearch/crawler-core";
 
 export class CrawlerPersistenceService {
   private pageRepository =

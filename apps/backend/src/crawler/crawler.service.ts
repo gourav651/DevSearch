@@ -1,26 +1,18 @@
 import axios from "axios";
-import { parseHtml } from "./html-parser";
-import { isDocumentationUrl, isSameDomain, normalizeUrl } from "./url-utils";
+import { parseHtml } from "@devsearch/crawler-core";
+import {
+  isDocumentationUrl,
+  isSameDomain,
+  normalizeUrl,
+} from "@devsearch/crawler-core";
 import { CrawlerPersistenceService } from "./crawler-persistence.service";
 import { CrawlJobService } from "../services/crawl-job.service";
+import { CrawlEngine } from "@devsearch/crawler-core";
 
 export class CrawlerService {
   private persistence = new CrawlerPersistenceService();
   private crawlJobService = new CrawlJobService();
-
-  async crawl(url: string) {
-    const response = await axios.get(url);
-
-    const parsedPage = parseHtml(response.data, url);
-
-    parsedPage.links = parsedPage.links.filter(
-      (link) =>
-        isSameDomain(link, url) &&
-        isDocumentationUrl(link, "https://redis.io/docs"),
-    );
-
-    return parsedPage;
-  }
+  private crawlEngine = new CrawlEngine();
 
   async crawlSite(startUrl: string, sourceId: string, maxPages = 10) {
     const job = await this.crawlJobService.create(sourceId);
@@ -47,7 +39,7 @@ export class CrawlerService {
         visited.add(normalizedUrl);
 
         try {
-          const page = await this.crawl(normalizedUrl);
+          const page = await this.crawlEngine.crawl(normalizedUrl);
           await this.persistence.savePage(
             sourceId,
             page.title,

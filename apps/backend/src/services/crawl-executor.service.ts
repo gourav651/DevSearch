@@ -1,15 +1,15 @@
 import { SourceRepository } from "../repositories/source.repository";
+import { CrawlerService } from "../crawler/crawler.service";
 import { AppError } from "../utils/AppError";
-import { QueueService } from "./queue.service";
 
-export class CrawlService {
+export class CrawlExecutorService {
   private sourceRepository =
     new SourceRepository();
 
-  private queueService =
-    new QueueService();
+  private crawlerService =
+    new CrawlerService();
 
-  async startCrawl(sourceSlug: string) {
+  async execute(sourceSlug: string) {
     const source =
       await this.sourceRepository.findBySlug(
         sourceSlug
@@ -22,15 +22,16 @@ export class CrawlService {
       );
     }
 
-    const jobId =
-      await this.queueService.enqueueCrawl(
-        sourceSlug
+    const visited =
+      await this.crawlerService.crawlSite(
+        source.crawlStartUrl,
+        source.id,
+        10
       );
 
     return {
       source: source.slug,
-      jobId,
-      status: "QUEUED",
+      pagesCrawled: visited.size,
     };
   }
 }

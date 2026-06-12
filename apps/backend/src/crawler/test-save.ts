@@ -1,10 +1,10 @@
-import { CrawlerService } from "./crawler.service";
+import { CrawlEngine } from "@devsearch/crawler-core";
 import { SourceRepository } from "../repositories/source.repository";
 import { CrawlerPersistenceService } from "./crawler-persistence.service";
 
 async function main() {
   const crawler =
-    new CrawlerService();
+  new CrawlEngine();
 
   const sourceRepository =
     new SourceRepository();
