@@ -1,6 +1,7 @@
 import { Worker } from "bullmq";
 import { redisConnection } from "./redis";
 import { setBusy, setOnline } from "./worker-status";
+import { CrawlJobData } from "@devsearch/shared-types";
 
 export const crawlWorker = new Worker(
   "crawl-queue",
@@ -10,7 +11,9 @@ export const crawlWorker = new Worker(
     try {
       console.log(`Processing job ${job.id}`);
 
-      console.log(job.data);
+      const data = job.data as CrawlJobData;
+
+      console.log(data);
 
       return {
         success: true,
